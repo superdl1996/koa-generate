@@ -61,7 +61,7 @@ router.get('/image', async (ctx, next) => {
 router.post('/generate', async (ctx, next) => {
   ctx.set('Access-Control-Expose-Headers', 'Content-Disposition');
 
-  const {codeModel,fileName} = ctx.request.body
+  const { codeModel, fileName } = ctx.request.body;
   // 设置响应头以便下载文件
   ctx.response.set('Content-Disposition', `attachment; filename=${fileName}.zip`);
   ctx.response.set('Content-Type', 'application/zip');
@@ -73,7 +73,17 @@ router.post('/generate', async (ctx, next) => {
   archive.append(codeModel.GenIndex, { name: `${fileName}/index.tsx` });
   archive.append(codeModel.GenServices, { name: `${fileName}/services.ts` });
   archive.append(codeModel.GenTypings, { name: `${fileName}/typings.d.ts` });
-  archive.append(codeModel.GenUseFormColumns, { name: `${fileName}/useFormColumns.tsx` });
+
+  /** 是否有主单据 */
+  if (codeModel?.GenMainDetails) {
+    archive.append(codeModel.GenMainDetails, { name: `${fileName}/MainDetails/index.tsx` });
+    archive.append(codeModel.GenUseFormColumns, {
+      name: `${fileName}/MainDetails/useMainFormColumns.tsx`,
+    });
+  } else {
+    archive.append(codeModel.GenUseFormColumns, { name: `${fileName}/useFormColumns.tsx` });
+  }
+
   archive.append(codeModel.GenUseTableColumns, { name: `${fileName}/useTableColumns.tsx` });
 
   // 将 archive 输出到响应流

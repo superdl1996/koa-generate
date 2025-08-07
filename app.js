@@ -24,13 +24,28 @@ app.use(
 );
 app.use(json());
 app.use(logger());
-app.use(require('koa-static')(__dirname + '/public'));
+// app.use(require('koa-static')(__dirname + '/public/dist'));
 
 app.use(
   views(__dirname + '/views', {
     extension: 'ejs',
   })
 );
+
+// app.use(
+//   views(__dirname + '/public/dist', {
+//     extension: 'html',
+//   })
+// );
+
+/** 解决vue 历史模式刷新404问题 */
+// app.use(async (ctx, next) => {
+//   if (ctx.status === 404 && ctx.method === 'GET') {
+//     await ctx.render('index');
+//   } else {
+//     await next();
+//   }
+// });
 
 // logger
 app.use(async (ctx, next) => {
@@ -48,5 +63,7 @@ app.use(users.routes(), users.allowedMethods());
 app.on('error', (err, ctx) => {
   console.error('server error', err, ctx);
 });
+
+
 
 module.exports = app;
